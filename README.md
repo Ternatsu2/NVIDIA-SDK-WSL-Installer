@@ -1,3 +1,7 @@
+Below is a simplified **README.md** reflecting the latest version of your project. The instructions are concise, focusing on the minimal steps required to run the **InstallWSL_Automated.exe**. We’ve removed references to progress bars and advanced details, keeping the process straightforward for users.
+
+---
+
 # NVIDIA SDK WSL Installer
 
 Automates the installation and configuration of:
@@ -5,76 +9,60 @@ Automates the installation and configuration of:
 - **Ubuntu (22.04 or 24.04)**
 - **NVIDIA SDK Manager**
 
-This PowerShell script simplifies the setup process for developers and engineers working with NVIDIA tools and WSL environments on Windows.
+This **executable** streamlines the entire setup process for developers and engineers using NVIDIA tools and WSL on Windows. 
 
 ---
 
-## Features
+## What It Does
 
-- Automatically checks for WSL and installs it if necessary.
-- Offers the choice of Ubuntu versions (22.04 or 24.04).
-- Installs required dependencies for NVIDIA SDK Manager.
-- Guides the user through placing the SDK Manager `.deb` file in the correct location.
-- Runs the installation silently with minimal user input.
-
----
-
-## Prerequisites
-
-1. **Windows System**:
-   - Ensure your Windows version supports WSL (Windows 10 version 2004 or later, or Windows 11).
-   
-2. **PowerShell**:
-   - Run PowerShell as an Administrator.
-
-3. **NVIDIA SDK Manager**:
-   - Download the `.deb` installer from [NVIDIA Developer](https://developer.nvidia.com/nvidia-sdk-manager).
-   - Place the `.deb` file in your Downloads folder.
+1. Checks if WSL is installed and, if not, enables and installs it.
+2. Installs Ubuntu 22.04.
+3. Installs required dependencies (including Google Chrome in WSL).
+4. Installs the NVIDIA SDK Manager from your provided `.deb` file.
 
 ---
 
-## Installation
+## Requirements
 
-### Steps to Follow
+1. **Windows 10 (2004+) or Windows 11** with WSL support.
+2. **Administrator Privileges** to run the installer.
+3. **NVIDIA SDK Manager `.deb` File**  
+   - Download the `.deb` package from [NVIDIA Developer](https://developer.nvidia.com/nvidia-sdk-manager)  
+   - Place it in your `C:\Users\<YourUser>\Downloads` folder.
 
-1. **Clone the Repository**  
-   Open a terminal and clone the repository to your local system:
-   ```bash
-   git clone https://github.com/your-username/NVIDIA-SDK-WSL-Installer.git
-   cd NVIDIA-SDK-WSL-Installer
-   ```
+---
 
-2. **Open PowerShell as Administrator**  
-   Launch PowerShell with Administrator privileges:
-   - Press `Win + S` to open the search bar.
-   - Type `PowerShell`.
-   - Right-click on "Windows PowerShell" and select **Run as Administrator**.
+## Usage
 
-3. **Navigate to the Repository Directory**  
-   Use the `cd` command to navigate to the directory where the repository was cloned:
-   ```powershell
-   cd C:\path\to\NVIDIA-SDK-WSL-Installer
-   ```
+1. **Download** the `InstallWSL_Automated.exe`.
+2. **Right-click** on `InstallWSL_Automated.exe` → **Run as Administrator**.
 
-4. **Run the Script**  
-   Execute the PowerShell script:
-   ```powershell
-   .\InstallWSL.ps1
-   ```
+That’s it. The script automatically performs all tasks behind the scenes. Once it finishes, you can open WSL and verify that Ubuntu is set up and the NVIDIA SDK Manager is installed.
 
-5. **Follow On-Screen Prompts**  
-   - Choose the Ubuntu version (22.04 or 24.04) when prompted.
-   - Ensure the NVIDIA SDK Manager `.deb` file is placed in your Downloads folder.
+---
 
-6. **Monitor Progress**  
-   - The script will perform all the necessary setup steps automatically.
-   - Progress and any issues will be logged to `install_log.txt` in your Downloads folder.
+## Troubleshooting
 
-7. **Verify Installation**  
-   Once the script completes:
-   - Open WSL and verify the Ubuntu version.
-   - Launch NVIDIA SDK Manager to confirm it was installed successfully.
+- **“File Not Found”**:  
+  Make sure the `.deb` file is in your Downloads folder.  
+- **Missing WSL**:  
+  The installer will enable it if needed, but ensure your Windows version supports it.  
+- **Administrator Privileges**:  
+  If the installer won’t run, verify you’re running it as admin. Right-click → **Run as Administrator**.  
 
-8. **Troubleshoot if Needed**  
-   If any issues arise, refer to the `install_log.txt` file or the Troubleshooting section in the README. 
 
+---
+
+## Contributing
+
+Have ideas or need additional features? Feel free to open an issue or submit a pull request. We welcome any improvements or bug reports.
+
+---
+
+## License
+
+Licensed under the [MIT License](LICENSE). Check the LICENSE file for details.
+
+---
+
+**Enjoy the one-click WSL + NVIDIA SDK Manager setup on Windows!**
