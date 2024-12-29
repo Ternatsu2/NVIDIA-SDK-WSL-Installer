@@ -6,7 +6,7 @@ Below is a simplified **README.md** reflecting the latest version of your projec
 
 Automates the installation and configuration of:
 - **Windows Subsystem for Linux (WSL)**
-- **Ubuntu (22.04 or 24.04)**
+- **Ubuntu 22.04 (Makes a custom distribution so you don't have to worry about overwriting your files)**
 - **NVIDIA SDK Manager**
 
 This **executable** streamlines the entire setup process for developers and engineers using NVIDIA tools and WSL on Windows. 

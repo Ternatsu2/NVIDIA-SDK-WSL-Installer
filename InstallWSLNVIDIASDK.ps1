@@ -1,4 +1,4 @@
-# Initialize progress tracking
+# Initialize progress tracking (if you still want minimal progress, you can remove or simplify)
 $StepsTotal = 6
 $StepCurrent = 0
 function Update-Progress {
@@ -11,11 +11,11 @@ function Update-Progress {
     Write-Progress -Activity $Activity -Status $Status -PercentComplete (($Current / $Total) * 100)
 }
 
-# Step 1: Define variables and check for SDK Manager .deb
+# Step 1: Define variables
 $StepCurrent++
-Update-Progress -Current $StepCurrent -Total $StepsTotal -Activity "WSL Setup" -Status "Checking for SDK Manager .deb..."
+Update-Progress -Current $StepCurrent -Total $StepsTotal -Activity "WSL Setup" -Status "Checking for SDK Manager..."
 
-$DistroName = "Ubuntu-22.04"
+$DistroName = "Ubuntu-22.04-NVIDIA"  # <--- Custom name to avoid conflicts
 $UserHomePath = [Environment]::GetFolderPath("UserProfile")
 $DownloadPath = Join-Path $UserHomePath "Downloads"
 $DistroTar = Join-Path $DownloadPath "ubuntu-22.04.tar"
@@ -27,9 +27,9 @@ if (-not $SdkManagerDeb) {
     exit 1
 }
 
-# Step 2: Check for ubuntu-22.04.tar and import distro
+# Step 2: Import a fresh distro every time
 $StepCurrent++
-Update-Progress -Current $StepCurrent -Total $StepsTotal -Activity "WSL Setup" -Status "Preparing to import Ubuntu .tar..."
+Update-Progress -Current $StepCurrent -Total $StepsTotal -Activity "WSL Setup" -Status "Importing new $DistroName distro..."
 
 Set-Location $DownloadPath
 if (-not (Test-Path $DistroTar)) {
@@ -37,27 +37,28 @@ if (-not (Test-Path $DistroTar)) {
     exit 1
 }
 
-Write-Host "$DistroName is not installed. Attempting to import from ubuntu-22.04.tar..."
-$DistroInstallPath = ".\Ubuntu_Install"
+Write-Host "$DistroName will be installed as a new WSL distro (no conflict with existing Ubuntus)."
+$DistroInstallPath = "C:\WSL\$DistroName"
 if (-not (Test-Path $DistroInstallPath)) {
     New-Item -ItemType Directory -Path $DistroInstallPath | Out-Null
 }
 
+# Force import under this new name
 wsl --import $DistroName $DistroInstallPath .\ubuntu-22.04.tar --version 2
 if ($LastExitCode -ne 0) {
-    Write-Host "Failed to import the distro. Check if you have Admin rights, correct file location, and NTFS permissions."
+    Write-Host "Failed to import $DistroName. Check if you have Admin rights or if your Windows version supports WSL."
     exit 1
 } else {
     Write-Host "$DistroName imported successfully."
 }
 
-# Step 3: Verify distro is registered
+# Step 3: Verify the new distro
 $StepCurrent++
-Update-Progress -Current $StepCurrent -Total $StepsTotal -Activity "WSL Setup" -Status "Verifying distro registration..."
+Update-Progress -Current $StepCurrent -Total $StepsTotal -Activity "WSL Setup" -Status "Verifying new distro registration..."
 
 $installedDistros = wsl --list --quiet
 if ($installedDistros -notcontains $DistroName) {
-    Write-Host "Distro not found after import. Something went wrong."
+    Write-Host "Distro $DistroName not found after import. Something went wrong."
     exit 1
 } else {
     Write-Host "$DistroName is registered and ready."
@@ -72,24 +73,18 @@ Write-Host "Found SDK Manager file: $SdkManagerPath"
 
 Write-Host "Setting up $DistroName and installing required packages..."
 
-# Step 5: Build the command array with DEBIAN_FRONTEND and selective error suppression
+# Step 5: Build the command array (suppressing apt's interactive messages, quieting wget, etc.)
 $StepCurrent++
 Update-Progress -Current $StepCurrent -Total $StepsTotal -Activity "WSL Setup" -Status "Installing dependencies & SDK Manager..."
 
 $Commands = @(
-    # Force noninteractive for apt/dpkg
     "export DEBIAN_FRONTEND=noninteractive",
-    # Update package lists, show errors if any
     "sudo apt-get update -y",
-    # Install needed packages, redirect only known debconf warnings
     "sudo apt-get install -y wget libnss3 libgbm1 libcanberra-gtk-module libcanberra-gtk3-module 2>/dev/null",
-    # Download Chrome **in quiet mode** to hide progress lines
+    # Quiet mode for wget to avoid spam
     "wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb",
-    # Install Chrome, ignore interactive prompts
     "sudo apt-get install -y ./google-chrome-stable_current_amd64.deb 2>/dev/null",
-    # Install SDK Manager .deb, redirect potential "dialog" warnings
     "sudo dpkg -i $SdkManagerPath 2>/dev/null",
-    # Fix broken installs
     "sudo apt --fix-broken install -y 2>/dev/null",
     "echo 'Installation complete. Launching SDK Manager...'",
     # Autoconfirm sdkmanager prompt
@@ -104,4 +99,4 @@ $StepCurrent++
 Update-Progress -Current $StepCurrent -Total $StepsTotal -Activity "WSL Setup" -Status "Completing setup..."
 
 Write-Progress -Activity "WSL Setup" -Status "Finished!" -Completed
-Write-Host "Process completed successfully without manual intervention."
+Write-Host "Process completed successfully without conflicts. $DistroName is now installed!"
