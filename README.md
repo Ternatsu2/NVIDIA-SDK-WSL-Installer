@@ -45,7 +45,7 @@ Before running the script, ensure you have the following:
 
 ---
 
-## Usage
+## Usage (After you meet the prerequisites)
 
 1. **Download** the `InstallWSL_Automated.exe`.
 2. **Right-click** on `InstallWSL_Automated.exe` → **Run as Administrator**.
