@@ -1,6 +1,3 @@
-Below is a simplified **README.md** reflecting the latest version of your project. The instructions are concise, focusing on the minimal steps required to run the **InstallWSL_Automated.exe**. We’ve removed references to progress bars and advanced details, keeping the process straightforward for users.
-
----
 
 # NVIDIA SDK WSL Installer
 
@@ -8,7 +5,8 @@ Automates the installation and configuration of:
 - **Windows Subsystem for Linux (WSL)**
 - **Ubuntu 22.04 (Makes a custom distribution so you don't have to worry about overwriting your files)**
 - **NVIDIA SDK Manager**
-
+  
+PLEASE NOTE THAT YOU MUST DOWNLOAD THE PREREQUISITES BEFORE RUNNING THE EXE.
 This **executable** streamlines the entire setup process for developers and engineers using NVIDIA tools and WSL on Windows. 
 
 ---
@@ -28,7 +26,7 @@ To ensure the user has everything they need to successfully run your script, her
 
 #### **Prerequisites**
 Before running the script, ensure you have the following:
-1. **Ubuntu 22.04 Tarball**
+1. **Ubuntu 22.04 Tarball `.tar`**
    - Download it from this link: https://drive.google.com/file/d/1pZXml5XwobZBa3Mft7ejphfUNqWAy81K/view?usp=drive_link
    - Place it in your `Downloads` folder.
 2. **NVIDIA SDK Manager `.deb` File**
