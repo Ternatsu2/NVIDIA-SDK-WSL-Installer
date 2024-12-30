@@ -34,13 +34,7 @@ Before running the script, ensure you have the following:
 2. **NVIDIA SDK Manager `.deb` File**
    - Download it from: https://developer.nvidia.com/nvidia-sdk-manager
    - Place it in your `Downloads` folder.
-3. **Administrator Privileges**
-   - Run the script as an administrator.
-4. **Windows System**
-   - Ensure WSL2 is supported (Windows 10 2004+ or Windows 11).
-5. **Google Chrome**
-   - The script will install Chrome if it’s not already installed.
-6. **Disk Space**
+3. **Disk Space**
    - Ensure at least 10 GB of free disk space is available.
 
 ---
