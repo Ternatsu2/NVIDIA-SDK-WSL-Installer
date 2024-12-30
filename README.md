@@ -22,13 +22,26 @@ This **executable** streamlines the entire setup process for developers and engi
 
 ---
 
-## Requirements
+To ensure the user has everything they need to successfully run your script, here’s a checklist of requirements:
 
-1. **Windows 10 (2004+) or Windows 11** with WSL support.
-2. **Administrator Privileges** to run the installer.
-3. **NVIDIA SDK Manager `.deb` File**  
-   - Download the `.deb` package from [NVIDIA Developer](https://developer.nvidia.com/nvidia-sdk-manager)  
-   - Place it in your `C:\Users\<YourUser>\Downloads` folder.
+---
+
+#### **Prerequisites**
+Before running the script, ensure you have the following:
+1. **Ubuntu 22.04 Tarball**
+   - Download it from this link: https://drive.google.com/file/d/1pZXml5XwobZBa3Mft7ejphfUNqWAy81K/view?usp=drive_link
+   - Place it in your `Downloads` folder.
+2. **NVIDIA SDK Manager `.deb` File**
+   - Download it from: https://developer.nvidia.com/nvidia-sdk-manager
+   - Place it in your `Downloads` folder.
+3. **Administrator Privileges**
+   - Run the script as an administrator.
+4. **Windows System**
+   - Ensure WSL2 is supported (Windows 10 2004+ or Windows 11).
+5. **Google Chrome**
+   - The script will install Chrome if it’s not already installed.
+6. **Disk Space**
+   - Ensure at least 10 GB of free disk space is available.
 
 ---
 
@@ -39,12 +52,13 @@ This **executable** streamlines the entire setup process for developers and engi
 
 That’s it. The script automatically performs all tasks behind the scenes. Once it finishes, you can open WSL and verify that Ubuntu is set up and the NVIDIA SDK Manager is installed.
 For detailed guidance on using NVIDIA SDK Manager, visit NVIDIA's official SDK Manager documentation. https://developer.nvidia.com/sdk-manager
+
 ---
 
 ## Troubleshooting
 
 - **“File Not Found”**:  
-  Make sure the `.deb` file is in your Downloads folder.  
+  Make sure the `.deb` and `.tar` files are in your Downloads folder.  
 - **Missing WSL**:  
   The installer will enable it if needed, but ensure your Windows version supports it.  
 - **Administrator Privileges**:  
