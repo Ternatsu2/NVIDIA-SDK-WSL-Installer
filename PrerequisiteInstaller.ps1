@@ -1,21 +1,20 @@
 <#
 .SYNOPSIS
-  Integrated Prerequisite Installer for WSL + Execution Policy Setup + Kernel MSI + Automatic wsl.exe --update.
-  Ensures the system is ready for the Main Installer (Ubuntu import & NVIDIA SDK Manager).
+  Integrated Prerequisite Installer for WSL (with forced reboot if updated).
 
 .DESCRIPTION
   1. Checks for Admin privileges.
-  2. Enables WSL optional features (Microsoft-Windows-Subsystem-Linux + VirtualMachinePlatform) using DISM.
-  3. Downloads & installs the WSL kernel update MSI if not detected.
-  4. Runs wsl.exe --update automatically (if supported).
+  2. Enables WSL & VirtualMachinePlatform using DISM.
+  3. Installs/updates the WSL kernel MSI if needed.
+  4. Runs wsl.exe --update (Store-based WSL).
   5. Sets WSL default version to 2.
-  6. Sets PowerShell Execution Policy to allow remote scripts.
-  7. Prompts for a reboot if needed (one reboot only).
-  8. Does not auto-close; user presses Enter to exit.
+  6. Sets PowerShell Execution Policy to RemoteSigned.
+  7. If any changes are made (features, kernel), it FORCIBLY reboots the system.
+  8. If no changes, it prints "No reboot required" and waits for Enter to exit.
 
 .NOTES
   Author: [Your Name]
-  Date: [Today]
+  Date:   [Today]
 #>
 
 Write-Host "`n=== Prerequisite WSL Installer & Setup ===`n"
@@ -33,7 +32,7 @@ function Assert-Admin {
 }
 Assert-Admin
 
-# STEP 2: Global Variables
+# STEP 2: Global variable to track if we made changes that require reboot
 $Global:needsReboot = $false
 
 # Variables for WSL Kernel MSI
@@ -45,11 +44,11 @@ $kernelLocalPath     = "$env:USERPROFILE\Downloads\$kernelInstallerName"
 function Enable-WSLFeatures {
     Write-Host "Checking if WSL & VM Platform features are enabled..."
 
-    $wslFeature = (Get-WindowsOptionalFeature -Online | Where-Object { $_.FeatureName -eq "Microsoft-Windows-Subsystem-Linux" })
-    $vmFeature  = (Get-WindowsOptionalFeature -Online | Where-Object { $_.FeatureName -eq "VirtualMachinePlatform" })
+    $wslFeature = Get-WindowsOptionalFeature -Online | Where-Object { $_.FeatureName -eq "Microsoft-Windows-Subsystem-Linux" }
+    $vmFeature  = Get-WindowsOptionalFeature -Online | Where-Object { $_.FeatureName -eq "VirtualMachinePlatform" }
 
     # If WSL not enabled
-    if ($wslFeature.State -ne "Enabled") {
+    if ($wslFeature -and $wslFeature.State -ne "Enabled") {
         Write-Host "Enabling Microsoft-Windows-Subsystem-Linux feature..."
         dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
         $Global:needsReboot = $true
@@ -58,7 +57,7 @@ function Enable-WSLFeatures {
     }
 
     # If Virtual Machine Platform not enabled
-    if ($vmFeature.State -ne "Enabled") {
+    if ($vmFeature -and $vmFeature.State -ne "Enabled") {
         Write-Host "Enabling VirtualMachinePlatform feature..."
         dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
         $Global:needsReboot = $true
@@ -82,16 +81,17 @@ function Install-KernelMSI {
     } else {
         try {
             $versionResult = wsl --version 2>&1
+            # On older systems, 'wsl --version' might not exist, so we fallback
             if ($versionResult -match "WSL version:" -or $versionResult -match "Windows Subsystem for Linux.*installed") {
-                Write-Host "WSL found, but let's ensure the kernel is up to date..."
+                Write-Host "WSL found, ensuring kernel is up to date..."
                 $kernelInstalled = $true
             } else {
-                Write-Host "WSL found, but exact version unclear. We'll install/update the kernel to be safe."
+                Write-Host "WSL found but version unclear. We'll force kernel update to be safe."
                 $kernelInstalled = $true
             }
         }
         catch {
-            Write-Host "WSL command not working properly. Let's install the kernel update."
+            Write-Host "WSL command not working properly, let's install the kernel update."
             $kernelInstalled = $true
         }
     }
@@ -111,16 +111,15 @@ function Install-KernelMSI {
         Start-Process msiexec.exe -ArgumentList "/i `"$kernelLocalPath`" /quiet /norestart" -Wait
         Write-Host "WSL kernel update installed."
         $Global:needsReboot = $true
-    }
-    else {
-        Write-Host "It appears the WSL kernel is already present. Skipping MSI install."
+    } else {
+        Write-Host "It appears the WSL kernel might be present. Skipping MSI install."
     }
 }
 
 Install-KernelMSI
 
 # STEP 5: Attempt wsl.exe --update (for Store-based WSL)
-function Update-WSL {
+function Update-StoreWSL {
     Write-Host "`nTrying wsl.exe --update (Store-based WSL support)..."
 
     $wslCheck = Get-Command wsl -ErrorAction SilentlyContinue
@@ -132,15 +131,15 @@ function Update-WSL {
         }
         catch {
             Write-Host "wsl.exe --update failed or not supported. Error: $_"
-            Write-Host "If the system is older (in-box WSL), this is normal. Continuing..."
+            Write-Host "If the system is older (in-box WSL), this might be normal. Continuing..."
         }
     }
     else {
-        Write-Host "No 'wsl' command found at all, skipping wsl.exe --update."
+        Write-Host "No 'wsl' command found, skipping wsl.exe --update."
     }
 }
 
-Update-WSL
+Update-StoreWSL
 
 # STEP 6: Set WSL default version to 2
 function Set-WSLVersion2 {
@@ -152,12 +151,12 @@ function Set-WSLVersion2 {
             Write-Host "WSL default set to version 2 successfully."
         }
         catch {
-            Write-Host "Failed to set default version to 2. This might require a reboot first."
+            Write-Host "Failed to set default version to 2. Possibly needs a reboot first."
             Write-Host "Error: $_"
         }
     }
     else {
-        Write-Host "No 'wsl' command found, can't set default version. Possibly needs a reboot first."
+        Write-Host "No 'wsl' command found, can't set default version to 2 yet."
     }
 }
 
@@ -177,13 +176,16 @@ function Configure-ExecutionPolicy {
 
 Configure-ExecutionPolicy
 
-# STEP 8: Prompt for Reboot if Needed
+# STEP 8: FORCED REBOOT if anything changed
 if ($Global:needsReboot) {
-    Write-Host "`nOne or more WSL features or kernel updates were installed."
-    Write-Host "A reboot is recommended to finalize changes."
-    Write-Host "`nAfter the reboot, run the MAIN INSTALLER script (the one that imports Ubuntu & sets up NVIDIA SDK)."
-    Write-Host "`nPress Enter to exit..."
+    Write-Host "`nOne or more WSL features or kernel updates were installed or updated."
+    Write-Host "We will now reboot your system to finalize changes."
+    Write-Host "After the reboot, please run the MAIN INSTALLER script (the one that imports Ubuntu & sets up NVIDIA SDK)."
+    Write-Host "`nPress Enter to reboot now..."
     [void][System.Console]::ReadLine()
+
+    # Force the reboot
+    shutdown /r /t 0
     exit
 }
 else {
