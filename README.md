@@ -39,8 +39,11 @@ Before running the script, ensure you have the following:
 
 ## Usage (After you meet the prerequisites)
 
-1. **Download** the `InstallWSL_Automated.exe`.
-2. **Right-click** on `InstallWSL_Automated.exe` → **Run as Administrator**.
+1. **Download** the `PrerequisiteInstaller.exe`.
+2. **Download** the `InstallNVIDIASDK_Automated.exe`.
+3. **Right-click** on `PrerequisiteInstaller.exe` → **Run as Administrator**. (Note that after running this script, you will be prompted to hit "Enter" to restart your computer and finish other changes.)
+4. When the restart is done, **Right-click** on `InstallNVIDIASDK_Automated.exe` → **Run as Administrator**.
+5. When the script is finished, it will open SDK Manager on its own.
 
 That’s it. The script automatically performs all tasks behind the scenes. Once it finishes, you can open WSL and verify that Ubuntu is set up and the NVIDIA SDK Manager is installed.
 For detailed guidance on using NVIDIA SDK Manager, visit NVIDIA's official SDK Manager documentation. https://developer.nvidia.com/sdk-manager
@@ -71,4 +74,4 @@ Licensed under the [MIT License](LICENSE). Check the LICENSE file for details.
 
 ---
 
-**Enjoy the one-click WSL + NVIDIA SDK Manager setup on Windows!**
+**Enjoy the easy WSL + NVIDIA SDK Manager setup on Windows!**
